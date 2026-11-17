@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Шпигун — Гра для друзів</title>
+  <script src="https://telegram.org"></script>
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #18222d);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #222e3c);
+      --text: var(--tg-theme-text-color, #ffffff);
+      --hint: var(--tg-theme-hint-color, #8b9bb4);
+      --btn: var(--tg-theme-button-color, #2ea6ff);
+      --btn-text: var(--tg-theme-button-text-color, #ffffff);
+      --danger: #ff4b4b;
+      --success: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; padding: 20px; user-select: none; }
+    .container { max-width: 420px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    h1 { font-size: 28px; text-align: center; margin-bottom: 8px; }
+    p.sub { text-align: center; color: var(--hint); font-size: 14px; margin-bottom: 24px; line-height: 1.4; }
+    .card { background: var(--sec-bg); border-radius: 18px; padding: 24px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.2); margin-bottom: 20px; }
+    .control-row { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; font-size: 18px; font-weight: 600; }
+    .counter { display: flex; align-items: center; gap: 15px; }
+    .circle-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--btn); color: var(--btn-text); font-size: 22px; font-weight: bold; cursor: pointer; }
+    .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--btn); color: var(--btn-text); font-size: 17px; font-weight: 600; cursor: pointer; transition: transform 0.1s; margin-top: 10px; }
+    .btn:active { transform: scale(0.98); }
+    .btn-danger { background: var(--danger); }
+    .btn-secondary { background: transparent; border: 2px solid var(--hint); color: var(--text); }
+    .hidden { display: none !important; }
+    .role-title { font-size: 26px; font-weight: 800; margin: 16px 0; }
+    .spy-text { color: var(--danger); }
+    .loc-text { color: var(--success); }
+    .emoji { font-size: 56px; margin-bottom: 10px; display: block; }
+    .timer { font-size: 48px; font-weight: 800; margin: 20px 0; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Екран налаштувань -->
+  <div id="screen-setup">
+    <h1>🕵️ Шпигун</h1>
+    <p class="sub">Передавайте телефон по колу. Усі знають локацію, крім одного шпигуна!</p>
+    
+    <div class="card">
+      <div class="control-row">
+        <span>Гравців:</span>
+        <div class="counter">
+          <button class="circle-btn" onclick="changePlayers(-1)">−</button>
+          <span id="players-count">4</span>
+          <button class="circle-btn" onclick="changePlayers(1)">+</button>
+        </div>
+      </div>
+      <div class="control-row">
+        <span>Шпигунів:</span>
+        <div class="counter">
+          <button class="circle-btn" onclick="changeSpies(-1)">−</button>
+          <span id="spies-count">1</span>
+          <button class="circle-btn" onclick="changeSpies(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="startGame()">Почати роздачу ролей</button>
+  </div>
+
+  <!-- Екран передачі телефону -->
+  <div id="screen-pass" class="hidden">
+    <div class="card">
+      <span class="emoji">📱</span>
+      <h2 id="player-turn-title">Гравець 1</h2>
+      <p class="sub" style="margin-top: 10px; margin-bottom: 0;">Візьміть телефон так, щоб інші не бачили екран, і натисніть кнопку нижче.</p>
+    </div>
+    <button class="btn" onclick="showRole()">Показати мою роль</button>
+  </div>
+
+  <!-- Екран ролі -->
+  <div id="screen-role" class="hidden">
+    <div class="card">
+      <span id="role-emoji" class="emoji">📍</span>
+      <div id="role-subtitle" style="color: var(--hint); font-size: 15px;">Ваша локація:</div>
+      <div id="role-main" class="role-title">Аеропорт</div>
+      <p id="role-desc" class="sub" style="margin-bottom: 0;">Ставте іншим обережні запитання, щоб вирахувати шпигуна, але не видайте локацію!</p>
+    </div>
+    <button class="btn btn-secondary" onclick="nextPlayer()">Зрозуміло, сховати роль</button>
+  </div>
+
+  <!-- Екран таймера гри -->
+  <div id="screen-timer" class="hidden">
+    <div class="card">
+      <span class="emoji">⏳</span>
+      <h2>Обговорення почалося!</h2>
+      <div id="timer-display" class="timer">05:00</div>
+      <p class="sub" style="margin-bottom: 0;">Ставте запитання по черзі. Коли час вийде — голосуйте, хто шпигун!</p>
+    </div>
+    <button class="btn btn-danger" onclick="revealSpy()">Завершити і показати шпигуна</button>
+  </div>
+
+  <!-- Екран результату -->
+  <div id="screen-end" class="hidden">
+    <div class="card">
+      <span class="emoji">🎭</span>
+      <h2>Гру завершено!</h2>
+      <p style="margin-top: 14px; color: var(--hint);">Локація була:</p>
+      <div id="end-location" class="role-title loc-text" style="font-size: 22px; margin: 6px 0 16px;">Лікарня</div>
+      <p style="color: var(--hint);">Шпигун(и):</p>
+      <div id="end-spies" class="role-title spy-text" style="font-size: 22px; margin-top: 6px;">Гравець 2</div>
+    </div>
+    <button class="btn" onclick="resetGame()">Зіграти ще раз</button>
+  </div>
+</div>
+
+<script>
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+  }
+
+  const locations = [
+    "✈️ Аеропорт", "🏥 Лікарня", "🏖️ Пляж", "🏦 Банк", "🏫 Школа",
+    "🚀 Космічна станція", "🎬 Кінотеатр", "🚢 Круїзний лайнер", "🎪 Цирк",
+    "🍽️ Ресторан", "🚔 Поліцейський відділок", "🏋️ Спортзал", "🛒 Супермаркет",
+    "🏰 Середньовічний замок", "🚇 Метро", "🏕️ Лісовий табір", "🏨 Готель",
+    "💇 Перукарня", "⛽ Автозаправка", "🎭 Театр", "🏛️ Музей", "⚽ Стадіон",
+    "🎰 Казино", "🚂 Поїзд", "🛥️ Підводний човен", "🎓 Університет",
+    "🏭 Завод", "🎡 Парк атракціонів", "⛪ Церква", "🏝️ Безлюдний острів"
+  ];
+
+  let playersCount = 4;
+  let spiesCount = 1;
+  let roles = [];
+  let currentPlayer = 0;
+  let chosenLocation = "";
+  let timerInterval = null;
+
+  function changePlayers(delta) {
+    playersCount = Math.min(12, Math.max(3, playersCount + delta));
+    if (spiesCount >= playersCount - 1) spiesCount = Math.max(1, playersCount - 2);
+    document.getElementById('players-count').textContent = playersCount;
+    document.getElementById('spies-count').textContent = spiesCount;
+  }
+
+  function changeSpies(delta) {
+    const maxSpies = Math.max(1, Math.floor(playersCount / 2));
+    spiesCount = Math.min(maxSpies, Math.max(1, spiesCount + delta));
+    document.getElementById('spies-count').textContent = spiesCount;
+  }
+
+  function showScreen(id) {
+    ['screen-setup', 'screen-pass', 'screen-role', 'screen-timer', 'screen-end'].forEach(s => {
+      document.getElementById(s).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function startGame() {
+    chosenLocation = locations[Math.floor(Math.random() * locations.length)];
+    roles = Array(playersCount).fill('local');
+    let assigned = 0;
+    while (assigned < spiesCount) {
+      let idx = Math.floor(Math.random() * playersCount);
+      if (roles[idx] === 'local') {
+        roles[idx] = 'spy';
+        assigned++;
+      }
+    }
+    currentPlayer = 0;
+    updatePassScreen();
+    showScreen('screen-pass');
+  }
+
+  function updatePassScreen() {
+    document.getElementById('player-turn-title').textContent = `Гравець ${currentPlayer + 1}`;
+  }
+
+  function showRole() {
+    const isSpy = roles[currentPlayer] === 'spy';
+    const emojiEl = document.getElementById('role-emoji');
+    const subEl = document.getElementById('role-subtitle');
+    const mainEl = document.getElementById('role-main');
+    const descEl = document.getElementById('role-desc');
+
+    if (isSpy) {
+      emojiEl.textContent = '🕵️';
+      subEl.textContent = 'Ваша таємна роль:';
+      mainEl.textContent = 'ТИ ШПИГУН!';
+      mainEl.className = 'role-title spy-text';
+      descEl.textContent = 'Ви не знаєте локацію. Слухайте запитання інших, блефуйте та спробуйте вгадати місце!';
+    } else {
+      emojiEl.textContent = '📍';
+      subEl.textContent = 'Секретна локація:';
+      mainEl.textContent = chosenLocation;
+      mainEl.className = 'role-title loc-text';
+      descEl.textContent = 'Ставте запитання іншим гравцям, щоб знайти шпигуна, але не називайте локацію прямо.';
+    }
+    showScreen('screen-role');
+  }
+
+  function nextPlayer() {
+    currentPlayer++;
+    if (currentPlayer < playersCount) {
+      updatePassScreen();
+      showScreen('screen-pass');
+    } else {
+      startTimer(playersCount * 60);
+      showScreen('screen-timer');
+    }
+  }
+
+  function startTimer(seconds) {
+    clearInterval(timerInterval);
+    let remaining = seconds;
+    updateTimerDisplay(remaining);
+    timerInterval = setInterval(() => {
+      remaining--;
+      updateTimerDisplay(remaining);
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay(sec) {
+    const m = String(Math.floor(sec / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    document.getElementById('timer-display').textContent = `${m}:${s}`;
+  }
+
+  function revealSpy() {
+    clearInterval(timerInterval);
+    document.getElementById('end-location').textContent = chosenLocation;
+    const spyNumbers = roles
+      .map((r, i) => (r === 'spy' ? `Гравець ${i + 1}` : null))
+      .filter(Boolean)
+      .join(', ');
+    document.getElementById('end-spies').textContent = spyNumbers;
+    showScreen('screen-end');
+  }
+
+  
