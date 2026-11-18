@@ -3,215 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Шпигун</title>
+  <title>Шпигун — Молодіжна версія</title>
   <script src="https://telegram.org"></script>
   <style>
-    :root {
-      --bg: var(--tg-theme-bg-color, #18222d);
-      --sec-bg: var(--tg-theme-secondary-bg-color, #222e3c);
-      --text: var(--tg-theme-text-color, #ffffff);
-      --hint: var(--tg-theme-hint-color, #8b9bb4);
-      --btn: var(--tg-theme-button-color, #2ea6ff);
-      --btn-text: var(--tg-theme-button-text-color, #ffffff);
-      --danger: #ff4b4b;
-      --success: #2ecc71;
-    }
+    :root { --bg: var(--tg-theme-bg-color, #18222d); --sec: var(--tg-theme-secondary-bg-color, #222e3c); --txt: var(--tg-theme-text-color, #fff); --hnt: var(--tg-theme-hint-color, #8b9bb4); --btn: var(--tg-theme-button-color, #2ea6ff); --btx: var(--tg-theme-button-text-color, #fff); }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; padding: 20px; user-select: none; }
-    .container { max-width: 420px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-    h1 { font-size: 28px; text-align: center; margin-bottom: 8px; }
-    p.sub { text-align: center; color: var(--hint); font-size: 14px; margin-bottom: 24px; line-height: 1.4; }
-    .card { background: var(--sec-bg); border-radius: 18px; padding: 24px; text-align: center; margin-bottom: 20px; }
-    .row { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; font-size: 18px; font-weight: 600; }
-    .counter { display: flex; align-items: center; gap: 15px; }
-    .c-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: var(--btn); color: var(--btn-text); font-size: 22px; font-weight: bold; cursor: pointer; }
-    .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--btn); color: var(--btn-text); font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-    .btn:active, .c-btn:active { opacity: 0.7; }
-    .btn-danger { background: var(--danger); }
-    .btn-sec { background: transparent; border: 2px solid var(--hint); color: var(--text); }
-    .hidden { display: none !important; }
-    .role-title { font-size: 26px; font-weight: 800; margin: 16px 0; }
-    .spy { color: var(--danger); }
-    .loc { color: var(--success); }
-    .emoji { font-size: 56px; margin-bottom: 10px; display: block; }
-    .timer { font-size: 48px; font-weight: 800; margin: 20px 0; }
+    body { background: var(--bg); color: var(--txt); display: flex; min-height: 100vh; padding: 18px; user-select: none; }
+    .box { max-width: 420px; width: 100%; margin: auto; text-align: center; }
+    h1 { font-size: 28px; margin-bottom: 6px; }
+    .sub { color: var(--hnt); font-size: 14px; margin-bottom: 18px; line-height: 1.4; }
+    .card { background: var(--sec); border-radius: 18px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .row { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; font-size: 17px; font-weight: 600; }
+    .cnt { display: flex; align-items: center; gap: 14px; }
+    .cb { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--btn); color: var(--btx); font-size: 22px; font-weight: 700; cursor: pointer; }
+    .cats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .cat { padding: 12px 8px; border-radius: 12px; border: 2px solid transparent; background: rgba(255,255,255,0.06); color: var(--txt); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s; }
+    .cat.full { grid-column: span 2; font-size: 14px; }
+    .cat.on { border-color: var(--btn); background: rgba(46,166,255,0.2); }
+    .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--btn); color: var(--btx); font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn:active, .cb:active, .cat:active { transform: scale(0.97); }
+    .red { background: #ff4b4b; }
+    .sec { background: transparent; border: 2px solid var(--hnt); color: var(--txt); }
+    .hide { display: none !important; }
+    .rt { font-size: 25px; font-weight: 800; margin: 14px 0; }
+    .spy { color: #ff4b4b; }
+    .loc { color: #2ecc71; }
+    .em { font-size: 54px; margin-bottom: 10px; display: block; }
+    .tm { font-size: 48px; font-weight: 800; margin: 18px 0; font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
-<div class="container">
-  <div id="s-setup">
+<div class="box">
+  <div id="s1">
     <h1>🕵️ Шпигун</h1>
-    <p class="sub">Передавайте телефон по колу. Усі знають локацію, крім одного шпигуна!</p>
+    <p class="sub">Оберіть тему, кількість гравців та передавайте телефон по колу!</p>
     <div class="card">
-      <div class="row">
-        <span>Гравців:</span>
-        <div class="counter">
-          <button type="button" class="c-btn" id="p-minus">−</button>
-          <span id="p-val">4</span>
-          <button type="button" class="c-btn" id="p-plus">+</button>
-        </div>
-      </div>
-      <div class="row">
-        <span>Шпигунів:</span>
-        <div class="counter">
-          <button type="button" class="c-btn" id="s-minus">−</button>
-          <span id="s-val">1</span>
-          <button type="button" class="c-btn" id="s-plus">+</button>
-        </div>
+      <div class="row"><span>Гравців:</span><div class="cnt"><button class="cb" id="pm">−</button><span id="pv">4</span><button class="cb" id="pp">+</button></div></div>
+      <div class="row"><span>Шпигунів:</span><div class="cnt"><button class="cb" id="sm">−</button><span id="sv">1</span><button class="cb" id="sp">+</button></div></div>
+      <div style="text-align:left; font-size:13px; color:var(--hnt); margin-top:14px;">Оберіть категорію локацій:</div>
+      <div class="cats">
+        <button class="cat full on" data-c="all">🔥 Всі теми разом (64 локації)</button>
+        <button class="cat" data-c="party">🥂 Тусовки і вписки</button>
+        <button class="cat" data-c="geek">🎮 Ігри та ТікТок</button>
+        <button class="cat" data-c="pop">🎬 Кіно і шоу-бізнес</button>
+        <button class="cat" data-c="trash">😈 Треш і крінж</button>
       </div>
     </div>
-    <button type="button" class="btn" id="btn-start">Почати роздачу ролей</button>
+    <button class="btn" id="go">Почати роздачу ролей</button>
   </div>
-
-  <div id="s-pass" class="hidden">
-    <div class="card">
-      <span class="emoji">📱</span>
-      <h2 id="turn-title">Гравець 1</h2>
-      <p class="sub" style="margin-top:10px;margin-bottom:0;">Візьміть телефон так, щоб інші не бачили екран, і натисніть кнопку нижче.</p>
-    </div>
-    <button type="button" class="btn" id="btn-show">Показати мою роль</button>
+  <div id="s2" class="hide">
+    <div class="card"><span class="em">📱</span><h2 id="tt">Гравець 1</h2><p class="sub" style="margin:10px 0 0;">Візьміть телефон так, щоб інші не бачили екран.</p></div>
+    <button class="btn" id="sh">Показати мою роль</button>
   </div>
-
-  <div id="s-role" class="hidden">
-    <div class="card">
-      <span id="r-emoji" class="emoji">📍</span>
-      <div id="r-sub" style="color:var(--hint);font-size:15px;">Ваша локація:</div>
-      <div id="r-main" class="role-title">Аеропорт</div>
-      <p id="r-desc" class="sub" style="margin-bottom:0;">Ставте обережні запитання, щоб знайти шпигуна!</p>
-    </div>
-    <button type="button" class="btn btn-sec" id="btn-next">Зрозуміло, сховати роль</button>
+  <div id="s3" class="hide">
+    <div class="card"><span id="re" class="em">📍</span><div id="rs" style="color:var(--hnt); font-size:15px;">Локація:</div><div id="rm" class="rt"></div><p id="rd" class="sub" style="margin:0;"></p></div>
+    <button class="btn sec" id="nx">Зрозуміло, сховати роль</button>
   </div>
-
-  <div id="s-timer" class="hidden">
-    <div class="card">
-      <span class="emoji">⏳</span>
-      <h2>Обговорення почалося!</h2>
-      <div id="timer-val" class="timer">04:00</div>
-      <p class="sub" style="margin-bottom:0;">Ставте запитання по черзі. Коли час вийде — голосуйте!</p>
-    </div>
-    <button type="button" class="btn btn-danger" id="btn-reveal">Завершити і показати шпигуна</button>
+  <div id="s4" class="hide">
+    <div class="card"><span class="em">⏳</span><h2>Обговорення почалося!</h2><div id="tv" class="tm">04:00</div><p class="sub" style="margin:0;">Ставте запитання по черзі, потім голосуйте!</p></div>
+    <button class="btn red" id="rv">Завершити і показати шпигуна</button>
   </div>
-
-  <div id="s-end" class="hidden">
-    <div class="card">
-      <span class="emoji">🎭</span>
-      <h2>Гру завершено!</h2>
-      <p style="margin-top:14px;color:var(--hint);">Локація була:</p>
-      <div id="end-loc" class="role-title loc" style="font-size:22px;margin:6px 0 16px;">Лікарня</div>
-      <p style="color:var(--hint);">Шпигун(и):</p>
-      <div id="end-spies" class="role-title spy" style="font-size:22px;margin-top:6px;">Гравець 2</div>
-    </div>
-    <button type="button" class="btn" id="btn-reset">Зіграти ще раз</button>
+  <div id="s5" class="hide">
+    <div class="card"><span class="em">🎭</span><h2>Гру завершено!</h2><p style="margin-top:14px; color:var(--hnt);">Локація була:</p><div id="el" class="rt loc" style="font-size:22px; margin:6px 0 16px;"></div><p style="color:var(--hnt);">Шпигун(и):</p><div id="es" class="rt spy" style="font-size:22px; margin-top:6px;"></div></div>
+    <button class="btn" id="rsb">Зіграти ще раз</button>
   </div>
 </div>
-
 <script>
-  if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
-  }
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
 
-  const locs = [
-    "✈️ Аеропорт", "🏥 Лікарня", "🏖️ Пляж", "🏦 Банк", "🏫 Школа",
-    "🚀 Космічна станція", "🎬 Кінотеатр", "🚢 Круїзний лайнер", "🎪 Цирк",
-    "🍽️ Ресторан", "🚔 Поліцейський відділок", "🏋️ Спортзал", "🛒 Супермаркет",
-    "🏰 Середньовічний замок", "🚇 Метро", "🏕️ Лісовий табір", "🏨 Готель",
-    "💇 Перукарня", "⛽ Автозаправка", "🎭 Театр", "🏛️ Музей", "⚽ Стадіон",
-    "🎰 Казино", "🚂 Поїзд", "🛥️ Підводний човен", "🎓 Університет"
-  ];
-
-  let players = 4, spies = 1, roles = [], cur = 0, chosen = "", timer = null;
-
-  const show = (id) => {
-    ["s-setup", "s-pass", "s-role", "s-timer", "s-end"].forEach(s => {
-      document.getElementById(s).classList.add("hidden");
-    });
-    document.getElementById(id).classList.remove("hidden");
+  const d = {
+    party: ["💨 Кальянна", "🪩 Нічний клуб", "🏠 Вписка на хаті", "🎤 Караоке-бар", "💃 Стрип-клуб", "🍾 VIP-ложа", "🎧 Рейв-вечірка", "💉 Тату-салон", "💈 Барбершоп", "🥂 Афтепаті на даху", "🍸 Коктейль-бар", "🏖️ Пляжна вечірка", "🔥 Баня з друзями", "🎲 Підпільне казино", "🚗 Нічний дрифт", "⛺ Наметовий фестиваль"],
+    geek: ["🖥️ Комп'ютерний клуб", "📹 ТікТок-хаус", "🎙️ Стрім-кімната", "🎧 Закритий Discord", "🏆 Кіберспорт-турнір", "🥽 VR-арена", "⛏️ Підвал майнера", "📱 Офіс геймдеву", "👾 Комік-кон", "🤖 Серверна кімната", "🎮 Магазин консолей", "📡 Студія ютубера", "🕹️ Зал ігрових автоматів", "💻 Нічний хакатон", "🎧 Студія звукозапису", "📸 Фотостудія з неоном"],
+    pop: ["🎬 Знімальний майданчик", "🎸 Закулісся концерту", "🌟 Червона доріжка", "💄 Гримерка зірки", "🏟️ Фан-зона стадіону", "🎥 Зйомки кліпу", "🎭 Театральна сцена", "📺 Прямий ефір на ТБ", "🏰 Голлівуд", "🎤 Репетиційна база", "🍿 Нічний кінотеатр", "🎪 Цирк за кулісами", "📻 Студія радіостанції", "🎨 Виставка мистецтва", "👗 Показ мод", "🏅 Церемонія нагородження"],
+    trash: ["🪖 Військкомат", "🏫 Кабінет директора", "🚓 Поліцейський бобік", "🛗 Застряглий ліфт", "🚽 Туалет на вокзалі", "👕 Секонд у день завозу", "🌯 Шаурмічна о 3 ночі", "🦷 Кабінет стоматолога", "🚌 Забита маршрутка", "🏚️ Закинута будівля", "🧾 Черга в податковій", "🏥 Приймальня в п'ятницю", "👮 Кімната допиту", "🛒 АТБ перед закриттям", "🚿 Спільний душ у гуртожитку", "⛽ Нічна заправка на трасі"]
   };
 
-  document.getElementById("p-minus").onclick = () => {
-    players = Math.max(3, players - 1);
-    if (spies >= players - 1) spies = Math.max(1, players - 2);
-    document.getElementById("p-val").textContent = players;
-    document.getElementById("s-val").textContent = spies;
+  let p = 4, s = 1, c = "all", r = [], cur = 0, loc = "", tm = null;
+  const $ = id => document.getElementById(id);
+  const sw = id => ["s1", "s2", "s3", "s4", "s5"].forEach(x => $(x).classList.toggle("hide", x !== id));
+
+  document.querySelectorAll(".cat").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".cat").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); c = b.dataset.c;
+  });
+
+  $("pm").onclick = () => { p = Math.max(3, p - 1); if (s >= p - 1) s = Math.max(1, p - 2); $("pv").textContent = p; $("sv").textContent = s; };
+  $("pp").onclick = () => { p = Math.min(12, p + 1); $("pv").textContent = p; };
+  $("sm").onclick = () => { s = Math.max(1, s - 1); $("sv").textContent = s; };
+  $("sp").onclick = () => { s = Math.min(Math.max(1, Math.floor(p / 2)), s + 1); $("sv").textContent = s; };
+
+  $("go").onclick = () => {
+    const pool = c === "all" ? [...d.party, ...d.geek, ...d.pop, ...d.trash] : d[c];
+    loc = pool[Math.floor(Math.random() * pool.length)];
+    r = Array(p).fill(0); let k = 0;
+    while (k < s) { let i = Math.floor(Math.random() * p); if (!r[i]) { r[i] = 1; k++; } }
+    cur = 0; $("tt").textContent = "Гравець 1"; sw("s2");
   };
 
-  document.getElementById("p-plus").onclick = () => {
-    players = Math.min(12, players + 1);
-    document.getElementById("p-val").textContent = players;
+  $("sh").onclick = () => {
+    const spy = r[cur] === 1;
+    $("re").textContent = spy ? "🕵️" : "📍";
+    $("rs").textContent = spy ? "Ваша таємна роль:" : "Секретна локація:";
+    $("rm").textContent = spy ? "ТИ ШПИГУН!" : loc;
+    $("rm").className = "rt " + (spy ? "spy" : "loc");
+    $("rd").textContent = spy ? "Ви не знаєте локацію. Слухайте запитання інших і блефуйте!" : "Ставте запитання іншим, щоб знайти шпигуна, але не називайте місце прямо.";
+    sw("s3");
   };
 
-  document.getElementById("s-minus").onclick = () => {
-    spies = Math.max(1, spies - 1);
-    document.getElementById("s-val").textContent = spies;
+  $("nx").onclick = () => {
+    if (++cur < p) { $("tt").textContent = "Гравець " + (cur + 1); sw("s2"); }
+    else { clearInterval(tm); let sec = p * 60; const u = () => { $("tv").textContent = String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0"); }; u(); tm = setInterval(() => --sec >= 0 ? u() : clearInterval(tm), 1000); sw("s4"); }
   };
 
-  document.getElementById("s-plus").onclick = () => {
-    spies = Math.min(Math.max(1, Math.floor(players / 2)), spies + 1);
-    document.getElementById("s-val").textContent = spies;
-  };
-
-  document.getElementById("btn-start").onclick = () => {
-    chosen = locs[Math.floor(Math.random() * locs.length)];
-    roles = Array(players).fill("local");
-    let count = 0;
-    while (count < spies) {
-      let idx = Math.floor(Math.random() * players);
-      if (roles[idx] === "local") { roles[idx] = "spy"; count++; }
-    }
-    cur = 0;
-    document.getElementById("turn-title").textContent = "Гравець 1";
-    show("s-pass");
-  };
-
-  document.getElementById("btn-show").onclick = () => {
-    const isSpy = roles[cur] === "spy";
-    const main = document.getElementById("r-main");
-    document.getElementById("r-emoji").textContent = isSpy ? "🕵️" : "📍";
-    document.getElementById("r-sub").textContent = isSpy ? "Ваша таємна роль:" : "Секретна локація:";
-    main.textContent = isSpy ? "ТИ ШПИГУН!" : chosen;
-    main.className = "role-title " + (isSpy ? "spy" : "loc");
-    document.getElementById("r-desc").textContent = isSpy
-      ? "Ви не знаєте локацію. Слухайте запитання інших і блефуйте!"
-      : "Ставте запитання іншим, щоб знайти шпигуна, не називаючи місце прямо.";
-    show("s-role");
-  };
-
-  document.getElementById("btn-next").onclick = () => {
-    cur++;
-    if (cur < players) {
-      document.getElementById("turn-title").textContent = "Гравець " + (cur + 1);
-      show("s-pass");
-    } else {
-      clearInterval(timer);
-      let sec = players * 60;
-      const upd = () => {
-        const m = String(Math.floor(sec / 60)).padStart(2, "0");
-        const s = String(sec % 60).padStart(2, "0");
-        document.getElementById("timer-val").textContent = m + ":" + s;
-      };
-      upd();
-      timer = setInterval(() => { if (--sec >= 0) upd(); else clearInterval(timer); }, 1000);
-      show("s-timer");
-    }
-  };
-
-  document.getElementById("btn-reveal").onclick = () => {
-    clearInterval(timer);
-    document.getElementById("end-loc").textContent = chosen;
-    document.getElementById("end-spies").textContent = roles
-      .map((r, i) => r === "spy" ? "Гравець " + (i + 1) : null)
-      .filter(Boolean).join(", ");
-    show("s-end");
-  };
-
-  document.getElementById("btn-reset").onclick = () => {
-    clearInterval(timer);
-    show("s-setup");
-  };
+  $("rv").onclick = () => { clearInterval(tm); $("el").textContent = loc; $("es").textContent = r.map((v, i) => v ? "Гравець " + (i + 1) : "").filter(Boolean).join(", "); sw("s5"); };
+  $("rsb").onclick = () => { clearInterval(tm); sw("s1"); };
 </script>
 </body>
 </html>
+
 
 
   
